@@ -171,7 +171,54 @@ def parse_truthfulqa(text, task_info):
             return solution_by_item
         else:
             return solution_by_item
+
+def parse_medmcqa(text, task_info):
+    # task_info = tuple(task_info.values())
+
+    pattern = r"\((\w+)\)|(\w+)\)"
+    matches = re.findall(pattern, text)
+    matches = [match[0] or match[1] for match in matches]
+
+    answers_raw = [task_info['opa'], task_info['opb'], task_info['opc'], task_info['opd']]
+    answers = [(chr(97 + i).upper(), answer) for i, answer in enumerate(answers_raw)]
+
+    solution_by_re = None
+    # assert len(matches)<=1, str(len(matches))
+    for match_str in matches[::-1]:
+        solution_by_re = match_str.upper()
+        if solution_by_re >= 'A' and solution_by_re <= answers[-1][0]:
+            break
+        else:
+            solution_by_re = None
+
     
+    solution_by_item = [-1 for _ in range(len(answers))]
+    idx = 0
+    for item in [a[1] for a in answers]:
+        pos = text.lower().rfind(item.lower().strip('., '))
+        if pos >= 0:
+            solution_by_item[idx] = pos
+        idx += 1
+
+
+    if max(solution_by_item) == -1:
+        solution_by_item = None
+    else:
+        solution_by_item = [a[0] for a in answers][
+            solution_by_item.index(max(solution_by_item))
+        ]
+
+    if solution_by_item is None and solution_by_re is not None:
+        return solution_by_re
+    elif solution_by_item is not None and solution_by_re is None:
+        return solution_by_item
+    elif solution_by_item is None and solution_by_re is None:
+        return None
+    elif solution_by_item is not None and solution_by_re is not None:
+        if solution_by_item == solution_by_re:
+            return solution_by_item
+        else:
+            return solution_by_item
 
 
 def parse_answer(dataset, text, raw_task):
@@ -188,6 +235,8 @@ def parse_answer(dataset, text, raw_task):
         parsed_answer = parse_mquake(text, raw_task)
     elif dataset == "truthfulqa":
         parsed_answer = parse_truthfulqa(text, raw_task)
+    elif dataset == "medmcqa":
+        parsed_answer = parse_medmcqa(text, raw_task)
     else:
         raise ValueError(f"Dataset {dataset} not supported")
     
@@ -230,8 +279,7 @@ def judge_answers(responses, question, dataset, raw_task, client):
         {"role": "user", "content": user_prompt}
     ]
     
-    judge_answer = query_model(client, judge_context)
-    judge_response = judge_answer.choices[0].message.content
+    judge_response = query_model(client, judge_context)
     parsed_decision = parse_answer(dataset, judge_response, raw_task)
     return parsed_decision
 
@@ -265,6 +313,8 @@ def check_answer_correctness(dataset, answer, gt):
             return 0
     elif dataset == 'truthfulqa':
         return (answer.lower() == gt[0][0].lower()) * 1
+    elif dataset == 'medmcqa':
+        return (answer.lower() == gt.lower()) * 1
     else:
         raise ValueError(f"Dataset {dataset} not supported")
 
@@ -452,7 +502,7 @@ def eval(args):
 
 if __name__ == "__main__":
     argsparser = argparse.ArgumentParser()
-    argsparser.add_argument("--eval_address", type=str, default='results/truthfulqa/100_3_3')
+    argsparser.add_argument("--eval_address", type=str, default='results/truthfulqa/adv_100_3_3_1-gpt-4o-gpt-3.5-turbo')
     argsparser.add_argument("--decision", type=str, default='majority', choices=['majority', 'judge'])
     args = argsparser.parse_args()
 

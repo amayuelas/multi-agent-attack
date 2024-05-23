@@ -2,6 +2,10 @@ import time
 from math_parsing import parse_math
 from prompt import agent_prompt
 
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+
 def query_model(client, agent_context, model_name="gpt-3.5-turbo-0125"):
     try:
         completion = client.chat.completions.create(
@@ -41,6 +45,16 @@ def query_hf_model(model, tokenizer, agent_context):
     return tokenizer.decode(response, skip_special_tokens=True)
 
 
+def load_model_tokenizer(model_name, device_map="auto"):
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype=torch.bfloat16,
+        device_map=device_map
+        )
+    return model, tokenizer
+
+
 def parse_question_answer(dataset_name, sample):
     
     if dataset_name == "mmlu":
@@ -50,7 +64,10 @@ def parse_question_answer(dataset_name, sample):
         c = sample[3]
         d = sample[4]
         answer = sample[5]
-        raw_task = tuple(sample.values())
+        if type(sample) == list:
+            raw_task = tuple(sample)
+        else:
+            raw_task = tuple(sample.values())
         question = agent_prompt[dataset_name]['question'].format(question_raw, a, b, c, d)
         return question, answer, raw_task
     
@@ -90,6 +107,16 @@ def parse_question_answer(dataset_name, sample):
         answer = [(chr(97 + i), answer) for i, answer in enumerate(answers_raw) if answers_raw[answer] == 1]
         raw_task = sample
         answers_txt = ', '.join([f"({letter.upper()}) {answer}" for letter, answer in answers])
+        question = agent_prompt[dataset_name]['question'].format(question_raw, answers_txt)
+        return question, answer, raw_task
+    
+    elif dataset_name == "medmcqa":
+        question_raw = sample['question']
+        answers_letters = ['a', 'b', 'c', 'd']
+        answers = [sample['opa'], sample['opb'], sample['opc'], sample['opd']]
+        answer = answers_letters[sample['cop'] - 1]
+        raw_task = sample
+        answers_txt = ', '.join([f"({letter.upper()}) {answer}" for letter, answer in zip(answers_letters, answers)])
         question = agent_prompt[dataset_name]['question'].format(question_raw, answers_txt)
         return question, answer, raw_task
     
