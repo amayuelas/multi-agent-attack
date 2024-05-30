@@ -43,7 +43,12 @@ def main(args):
     out_dir = Path(args.output_dir, args.dataset, f"{args.n_samples}_{args.n_agents}_{args.n_rounds}_{str_model_name}")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    dataset = get_dataset(dataset_name=args.dataset, n_samples=args.n_samples)
+    if args.input_file:
+        with open(args.input_file, 'r') as f:
+            dataset = [json.loads(line) for line in f]
+    else: 
+        dataset = get_dataset(dataset_name=args.dataset, n_samples=args.n_samples)
+
     n_agents = args.n_agents
     n_rounds = args.n_rounds
 
@@ -97,8 +102,9 @@ def main(args):
 if __name__ == "__main__":
 
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("--dataset", type=str, default='truthfulqa', choices=['mmlu', 'chess', 'math', 'mquake', 'musique', 'truthfulqa', 'medmcqa'])
+    argparser.add_argument("--dataset", type=str, default='truthfulqa', choices=['mmlu', 'chess', 'math', 'mquake', 'musique', 'truthfulqa', 'medmcqa', 'scalr'])
     argparser.add_argument("--n_samples", type=int, default=100)
+    argparser.add_argument("--input_file", type=str, default=None)
     argparser.add_argument("--n_agents", type=int, default=3)
     argparser.add_argument("--n_rounds", type=int, default=3)
     argparser.add_argument("--n_reps", type=int, default=5)

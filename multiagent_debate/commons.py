@@ -28,10 +28,10 @@ def query_hf_model(model, tokenizer, agent_context):
         return_tensors="pt"
     ).to(model.device)
 
-    terminators = [
-        tokenizer.eos_token_id,
-        tokenizer.convert_tokens_to_ids("<|eot_id|>")
-    ]
+
+    terminators = [tokenizer.eos_token_id]
+    if "llama" in model.name_or_path or "gpt" in model.name_or_path:
+        terminators.appen(tokenizer.convert_tokens_to_ids("<|eot_id|>"))
 
     outputs = model.generate(
         input_ids,
@@ -120,5 +120,38 @@ def parse_question_answer(dataset_name, sample):
         question = agent_prompt[dataset_name]['question'].format(question_raw, answers_txt)
         return question, answer, raw_task
     
+    elif dataset_name == 'scalr':
+
+        question_raw = sample['question']
+        answers_letters = ['a', 'b', 'c', 'd', 'e']
+        answers = [sample['choice_0'], sample['choice_1'], sample['choice_2'], sample['choice_3'], sample['choice_4']]
+        answer = answers_letters[sample['answer'] ]
+        raw_task = sample
+        answers_txt = ', '.join([f"({letter.upper()}) {answer}" for letter, answer in zip(answers_letters, answers)])
+        question = agent_prompt[dataset_name]['question'].format(question_raw, answers_txt)
+        return question, answer, raw_task
+    
     else:
         raise ValueError(f"Dataset {dataset_name} not supported")
+    
+
+
+def query_model_extra(client, agent_context, model_name="gpt-3.5-turbo-0125", logprobs=False, top_logprobs=None, max_tokens=None, n_repetitions=1):
+    
+    top_logprobs = None if not logprobs else top_logprobs
+
+    try:
+        completion = client.chat.completions.create(
+                model=model_name,
+                messages=agent_context,
+                n=n_repetitions,
+                logprobs=logprobs, 
+                top_logprobs=top_logprobs,
+                max_tokens=max_tokens 
+                )
+    except:
+        print("retrying due to an error......")
+        time.sleep(20)
+        return query_model_extra(agent_context)
+    
+    return completion

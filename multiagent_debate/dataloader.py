@@ -150,6 +150,49 @@ class TruthfulQA:
         return len(self.selected_data)
 
 
+class MedMCQA:
+    def __init__(self, dataset_name='medmcqa', n_samples=50, data_dir='data'):
+        self.dataset_name = dataset_name
+        self.data_path = f'{data_dir}/{dataset_name}'
+        self.data_file = self.data_path + '/dev.json'
+        self.data = None
+        self.n_samples = n_samples
+        self.selected_data = None
+        self.load_data()
+    
+    def load_data(self):
+        self.data = pd.read_json('data/medmcqa/dev.json', lines=True)
+        self.filtered_data = self.data[ self.data['choice_type'] == 'single']
+        self.selected_data = self.filtered_data.sample(self.n_samples)
+    
+    def __getitem__(self, idx):
+        return self.selected_data.iloc[idx].to_dict()
+    
+    def __len__(self):
+        return len(self.selected_data)
+
+
+class Scalr:
+    def __init__(self, dataset_name='scalr', n_samples=50, data_dir='data'):
+        self.dataset_name = dataset_name
+        self.data_path = f'{data_dir}/{dataset_name}'
+        self.data_file = self.data_path + '/test.jsonl'
+        self.data = None
+        self.n_samples = n_samples
+        self.selected_data = None
+        self.load_data()
+    
+    def load_data(self):
+        self.data = pd.read_json('data/scalr/test.jsonl', lines=True )
+        self.selected_data = self.data.sample(self.n_samples)
+    
+    def __getitem__(self, idx):
+        return self.selected_data.iloc[idx].to_dict()
+    
+    def __len__(self):
+        return len(self.selected_data)
+
+
 def get_dataset(dataset_name='mmlu', n_samples=50, data_dir='data'):
 
     if dataset_name == 'mmlu':
@@ -164,6 +207,10 @@ def get_dataset(dataset_name='mmlu', n_samples=50, data_dir='data'):
         return Musique(dataset_name, n_samples, data_dir)
     elif dataset_name == 'truthfulqa':
         return TruthfulQA(dataset_name, n_samples, data_dir)
+    elif dataset_name == 'medmcqa':
+        return MedMCQA(dataset_name, n_samples, data_dir)
+    elif dataset_name == 'scalr':
+        return Scalr(dataset_name, n_samples, data_dir)
     else:
         raise ValueError(f"Dataset {dataset_name} not supported")
         
