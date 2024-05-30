@@ -67,6 +67,8 @@ def main(args):
         with open(out_dir / fname, 'w') as f:
             for i, sample in tqdm(enumerate(dataset), total=len(dataset)):
 
+                if args.input_file:
+                    sample = sample['raw_task']
                 question, answer, raw_task = parse_question_answer(args.dataset, sample)
                 # print('raw_task:', raw_task)
 
