@@ -52,7 +52,7 @@ def main(args):
     n_agents = args.n_agents
     n_rounds = args.n_rounds
 
-    if "mistral" in args.model_name or "llama" in args.model_name:
+    if "mistral" in args.model_name or "llama" in args.model_name or "Yi" in args.model_name or "Qwen" in args.model_name:
         # load tokenizer and model
         model, tokenizer = load_model_tokenizer(args.model_name)
     elif "gpt" in args.model_name:
@@ -83,7 +83,7 @@ def main(args):
                             message = construct_message(args.dataset, agent_contexts_other, question, 2 * round - 1)
                             agent_context.append(message)
 
-                        if "mistral" in args.model_name or "llama" in args.model_name:
+                        if "mistral" in args.model_name or "llama" in args.model_name or "Yi" in args.model_name or "Qwen" in args.model_name:
                             # print('agent_context:', agent_context)
                             completion = query_hf_model(model, tokenizer, agent_context)
                             # print('completion:', completion)

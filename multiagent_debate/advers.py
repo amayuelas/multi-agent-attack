@@ -121,7 +121,7 @@ def main(args):
 
     if "gpt" in args.group_model or "gpt" in args.adv_model:
         client = OpenAI()
-    elif "mistral" in args.group_model or "mistral" in args.adv_model or "llama" in args.group_model or "llama" in args.adv_model or 'Qwen' in args.group_model or "Qwen" in args.adv_model:
+    elif "mistral" in args.group_model or "mistral" in args.adv_model or "llama" in args.group_model or "llama" in args.adv_model or 'Qwen' in args.group_model or "Qwen" in args.adv_model or "Yi" in args.group_model or "Yi" in args.adv_model:
         group_model, group_tokenizer = load_model_tokenizer(args.group_model)
         adv_model, adv_tokenizer = load_model_tokenizer(args.adv_model)
     else:
@@ -169,7 +169,7 @@ def main(args):
                                 agent_contexts_other = agent_contexts[:agent] + agent_contexts[agent+1:]
                                 message = construct_adversary_message(args.dataset, agent_contexts_other, adv_answer, 2 * round - 1)
                                 agent_context.append(message)
-                                if "mistral" in args.adv_model or "llama" in args.adv_model or 'Qwen' in args.adv_model:
+                                if "mistral" in args.adv_model or "llama" in args.adv_model or 'Qwen' in args.adv_model or "Yi" in args.adv_model:
                                     completion = query_hf_model(adv_model, adv_tokenizer, agent_context)
                                 elif "gpt" in args.adv_model:
                                     completion = query_model(client, agent_context, args.adv_model)
@@ -180,7 +180,7 @@ def main(args):
                                 agent_contexts_other = agent_contexts[:agent] + agent_contexts[agent+1:]
                                 message = construct_message(args.dataset, agent_contexts_other, question, 2 * round - 1)
                                 agent_context.append(message)
-                                if "mistral" in args.group_model or "llama" in args.group_model or 'Qwen' in args.group_model:
+                                if "mistral" in args.group_model or "llama" in args.group_model or 'Qwen' in args.group_model or "Yi" in args.group_model:
                                     completion = query_hf_model(group_model, group_tokenizer, agent_context)
                                 elif "gpt" in args.group_model:
                                     completion = query_model(client, agent_context, args.adv_model)
@@ -191,14 +191,14 @@ def main(args):
 
                         else: 
                             if agent in range(args.n_adversaries):
-                                if "mistral" in args.adv_model or "llama" in args.adv_model or 'Qwen' in args.adv_model:
+                                if "mistral" in args.adv_model or "llama" in args.adv_model or 'Qwen' in args.adv_model or "Yi" in args.adv_model:
                                     completion = query_hf_model(adv_model, adv_tokenizer, agent_context)
                                 elif "gpt" in args.adv_model:
                                     completion = query_model(client, agent_context, args.adv_model)
                                 else:
                                     raise ValueError(f"Model not supported")
                             else:
-                                if "mistral" in args.group_model or "llama" in args.group_model or 'Qwen' in args.group_model:
+                                if "mistral" in args.group_model or "llama" in args.group_model or 'Qwen' in args.group_model or "Yi" in args.group_model:
                                     completion = query_hf_model(group_model, group_tokenizer, agent_context)
                                 elif "gpt" in args.group_model:
                                     completion = query_model(client, agent_context, args.adv_model)
