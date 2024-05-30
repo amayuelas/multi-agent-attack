@@ -31,7 +31,7 @@ def query_hf_model(model, tokenizer, agent_context):
 
     terminators = [tokenizer.eos_token_id]
     if "llama" in model.name_or_path or "gpt" in model.name_or_path:
-        terminators.appen(tokenizer.convert_tokens_to_ids("<|eot_id|>"))
+        terminators.append(tokenizer.convert_tokens_to_ids("<|eot_id|>"))
 
     outputs = model.generate(
         input_ids,
