@@ -6,6 +6,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
+
 def query_model(client, agent_context, model_name="gpt-3.5-turbo-0125"):
     try:
         completion = client.chat.completions.create(
@@ -30,7 +31,7 @@ def query_hf_model(model, tokenizer, agent_context):
 
 
     terminators = [tokenizer.eos_token_id]
-    if "llama" in model.name_or_path or "gpt" in model.name_or_path:
+    if "llama" in model.name_or_path.lower() or "gpt" in model.name_or_path.lower():
         terminators.append(tokenizer.convert_tokens_to_ids("<|eot_id|>"))
 
     outputs = model.generate(

@@ -111,7 +111,7 @@ if __name__ == "__main__":
     argparser.add_argument("--n_rounds", type=int, default=3)
     argparser.add_argument("--n_reps", type=int, default=5)
     argparser.add_argument("--output_dir", type=str, default='results/')
-    argparser.add_argument("--model_name", type=str, default='meta-llama/llama-2-7b-chat-hf', choices=['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o', 'mistralai/mistral-7b-instruct-v2', 'meta-llama/llama-3-8b-instruct', 'meta-llama/llama-2-7b-chat-hf', 'Qwen/Qwen1.5-14B-Chat', '01-ai/Yi-1.5-9B-Chat'])
+    argparser.add_argument("--model_name", type=str, default='meta-llama/llama-2-7b-chat-hf', choices=['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o', 'mistralai/mistral-7b-instruct-v2', 'meta-llama/meta-llama-3-8B-Instruct', 'meta-llama/llama-2-7b-chat-hf','meta-llama/Llama-2-13b-chat-hf', 'Qwen/Qwen1.5-14B-Chat', '01-ai/Yi-1.5-9B-Chat'])
     argparser.add_argument("--gpus", type=str, default='0')
     args = argparser.parse_args()
 

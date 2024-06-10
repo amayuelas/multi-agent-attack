@@ -183,7 +183,7 @@ def main(args):
                                 if "mistral" in args.group_model or "llama" in args.group_model or 'Qwen' in args.group_model or "Yi" in args.group_model:
                                     completion = query_hf_model(group_model, group_tokenizer, agent_context)
                                 elif "gpt" in args.group_model:
-                                    completion = query_model(client, agent_context, args.adv_model)
+                                    completion = query_model(client, agent_context, args.group_model)
                                 else:
                                     raise ValueError(f"Model not supported")
                                 
@@ -201,7 +201,7 @@ def main(args):
                                 if "mistral" in args.group_model or "llama" in args.group_model or 'Qwen' in args.group_model or "Yi" in args.group_model:
                                     completion = query_hf_model(group_model, group_tokenizer, agent_context)
                                 elif "gpt" in args.group_model:
-                                    completion = query_model(client, agent_context, args.adv_model)
+                                    completion = query_model(client, agent_context, args.group_model)
                                 else:
                                     raise ValueError(f"Model not supported")
                             
