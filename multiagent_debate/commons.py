@@ -23,18 +23,28 @@ def query_model(client, agent_context, model_name="gpt-3.5-turbo-0125"):
 
 
 def query_hf_model(model, tokenizer, agent_context):
+    # Wrap the model in DataParallel to enable multi-GPU support
+    if torch.cuda.device_count() > 1 and not isinstance(model, torch.nn.DataParallel):
+        model = torch.nn.DataParallel(model)
+
+    device = model.device if not isinstance(model, torch.nn.DataParallel) else model.module.device
+
     input_ids = tokenizer.apply_chat_template(
         agent_context,
         add_generation_prompt=True,
         return_tensors="pt"
-    ).to(model.device)
+    ).to(device)
 
+    # Check if the model is wrapped in DataParallel
+    model_name_or_path = model.module.name_or_path if isinstance(model, torch.nn.DataParallel) else model.name_or_path
 
     terminators = [tokenizer.eos_token_id]
-    if "llama" in model.name_or_path.lower() or "gpt" in model.name_or_path.lower():
-        terminators.append(tokenizer.convert_tokens_to_ids("<|eot_id|>"))
+    if "llama" in model_name_or_path.lower() or "gpt" in model_name_or_path.lower():
+        terminators.append(tokenizer.convert_tokens_to_ids(""))
 
-    outputs = model.generate(
+    # Generate the output
+    generate_method = model.module.generate if isinstance(model, torch.nn.DataParallel) else model.generate
+    outputs = generate_method(
         input_ids,
         max_new_tokens=1000,
         eos_token_id=terminators,
@@ -46,17 +56,23 @@ def query_hf_model(model, tokenizer, agent_context):
     return tokenizer.decode(response, skip_special_tokens=True)
 
 
-def load_model_tokenizer(model_name, device_map="auto",
-                         token=None):
+def load_model_tokenizer(model_name, device_map="auto", token=None):
     print(f"token: {token}")
-    tokenizer = AutoTokenizer.from_pretrained(model_name,
-                                              token=token)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, token=token)
+
+    # Load the model
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=torch.bfloat16,
         device_map=device_map,
         token=token
-        )
+    )
+
+    # Check if multiple GPUs are available and wrap the model in DataParallel if so
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
+        print(f"Using {torch.cuda.device_count()} GPUs for inference")
+
     return model, tokenizer
 
 

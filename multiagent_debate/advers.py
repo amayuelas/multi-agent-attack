@@ -104,7 +104,7 @@ def select_adv_answer(dataset_name, answer, raw_task):
     return adv_answer
 
 def main(args):
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
+    # os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
     # assert the number of adversaries is <= number of agents
     assert args.n_adversaries <= args.n_agents
@@ -246,7 +246,6 @@ if __name__ == "__main__":
     argparser.add_argument("--n_adversaries", type=int, default=1)
     argparser.add_argument("--group_model", type=str, default='gpt-3.5-turbo')
     argparser.add_argument("--adv_model", type=str, default='gpt-3.5-turbo')
-    argparser.add_argument("--gpus", type=str, default='0')
 
     # warning experiment
     argparser.add_argument("--warning", action='store_true')
