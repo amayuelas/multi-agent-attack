@@ -1,8 +1,8 @@
 import time
 from math_parsing import parse_math
 from prompt import agent_prompt
-
 import torch
+
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
@@ -46,12 +46,16 @@ def query_hf_model(model, tokenizer, agent_context):
     return tokenizer.decode(response, skip_special_tokens=True)
 
 
-def load_model_tokenizer(model_name, device_map="auto"):
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+def load_model_tokenizer(model_name, device_map="auto",
+                         token=None):
+    print(f"token: {token}")
+    tokenizer = AutoTokenizer.from_pretrained(model_name,
+                                              token=token)
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=torch.bfloat16,
-        device_map=device_map
+        device_map=device_map,
+        token=token
         )
     return model, tokenizer
 

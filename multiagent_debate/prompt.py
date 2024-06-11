@@ -10,7 +10,7 @@ agent_prompt = {
     "math":{
         "question": "Here is a math problem written in LaTeX:{}\nPlease carefully consider it and explain your reasoning. Put your answer in the form \\boxed{{answer}}, at the end of your response.",
         "debate": [
-            "These are the solutions to the problem from other agents:",
+            "These are the solutions to the problem from other agents: ",
             "\n\nUsing the reasoning from other agents as additional information and referring to your historical answers, can you give an updated answer? Put your answer in the form \\boxed{{answer}}, at the end of your response."
            ],
     },
