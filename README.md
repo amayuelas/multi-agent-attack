@@ -1,6 +1,6 @@
 # Multi Agent Attack
 
-Code for the paper "MultiAgent Collaboration Attack: Investigating Adversarial Attacks in Large Language Model Collaborations via Debate"
+Code for the paper [MultiAgent Collaboration Attack: Investigating Adversarial Attacks in Large Language Model Collaborations via Debate](https://arxiv.org/abs/2406.14711)
 
  ![Attack Description](multiagent_debate/plots/attack_idea_example.png "Example of Adversary in Debate")
 
