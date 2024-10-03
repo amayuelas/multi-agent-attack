@@ -2,7 +2,7 @@
 
 Code for the paper "MultiAgent Collaboration Attack: Investigating Adversarial Attacks in Large Language Model Collaborations via Debate"
 
- ![Attack Description](multiagent_debate/plots/attack_idea_example.png.png "Example of Adversary in Debate")
+ ![Attack Description](multiagent_debate/plots/attack_idea_example.png "Example of Adversary in Debate")
 
 # Installation
 
