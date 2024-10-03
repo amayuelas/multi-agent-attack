@@ -53,7 +53,7 @@ def construct_adversary_message(dataset_name, agents, answer, argument, context,
         prefix_string = prefix_string + response
 
     if optim_flag and not context_flag:
-        prefix_string = prefix_string + adversary_prompt[dataset_name]['debate'] + " Use the given answer and the argument for your reponse. \n" + "Your answer: " + f"({answer.upper()})" + '\n\n' + "Your Argument: " + argument
+        prefix_string = prefix_string + adversary_prompt[dataset_name]['debate'] + " You are also provided with your argument to use. \n" + '\n\n' + "Your Argument: " + argument + '\n\n' + "Your answer: " + f"({answer.upper()})"
     elif not optim_flag and context_flag:
         prefix_string = prefix_string + adversary_prompt[dataset_name]['debate'] + " Use the given answer and the context for your reponse. \n" + "Your answer: " + f"({answer.upper()})" + '\n\n' + "Context: " + context
     elif optim_flag and context_flag:
@@ -74,30 +74,30 @@ def generate_random_chess_move():
     return random.choice(possible_letter) + str(random.choice(possible_number))
 
 def select_adv_answer(dataset_name, answer, raw_task):
-    if args.dataset == 'truthfulqa':
+    if dataset_name == 'truthfulqa':
         answer_letters = [chr(97 + i) for i in range(len(raw_task['mc1_targets']))]
         answer_letters.remove(answer[0][0])
         incorrect_answers = answer_letters
         adv_answer = random.choice(incorrect_answers)
-    elif args.dataset == 'mmlu':
+    elif dataset_name == 'mmlu':
         answer_letters = ['a', 'b', 'c', 'd']
         answer_letters.remove(answer[0][0].lower())
         adv_answer = random.choice(answer_letters)
-    elif args.dataset == 'chess':
+    elif dataset_name == 'chess':
         random_move = answer[0]
         while random_move in answer:
             random_move = generate_random_chess_move()
         adv_answer = random_move
-    elif args.dataset == 'medmcqa':
+    elif dataset_name == 'medmcqa':
         answer_letters = ['a', 'b', 'c', 'd']
         answer_letters.remove(answer.lower())
         adv_answer = random.choice(answer_letters)
-    elif args.dataset == 'scalr':
+    elif dataset_name == 'scalr':
         answer_letters = ['a', 'b', 'c', 'd', 'e']
         answer_letters.remove(answer.lower())
         adv_answer = random.choice(answer_letters)        
     else:
-        raise ValueError(f"Dataset {args.dataset} not supported")
+        raise ValueError(f"Dataset {dataset_name} not supported")
 
     return adv_answer
 
@@ -198,7 +198,7 @@ def main(args):
         str_mode += "_context"
 
     # check if out_dir exists, create it if not
-    our_dir = Path(args.output_dir, args.dataset, f"adv_plus{str_mode}_{args.n_samples}_{args.n_agents}_{args.n_rounds}_{args.n_adversaries}-{str_group_model}-{str_adv_model}-{str_judge_model}")
+    our_dir = Path(args.output_dir, args.dataset, f"TRIAL_adv_plus{str_mode}_{args.n_samples}_{args.n_agents}_{args.n_rounds}_{args.n_adversaries}-{str_group_model}-{str_adv_model}-{str_judge_model}")
     our_dir.mkdir(parents=True, exist_ok=True)
 
     if args.input_file:
@@ -344,22 +344,22 @@ if __name__ == "__main__":
 
     argparser = argparse.ArgumentParser()
     argparser.add_argument("--dataset", type=str, default='truthfulqa', choices=['mmlu', 'chess', 'math', 'mquake', 'musique', 'truthfulqa', 'medmcqa', 'scalr'])
-    argparser.add_argument("--input_file", type=str, default=None, required=False)
+    argparser.add_argument("--input_file", type=str, default='results/truthfulqa/adv_plus_context_100_3_3_1-gpt-4o-gpt-3.5-turbo-gpt-3.5-turbo/adv_plus_context_truthfulqa_100_3_3_1_0-gpt-4o-gpt-3.5-turbo-gpt-3.5-turbo.jsonl', required=False)
     argparser.add_argument("--n_samples", type=int, default=100)
     argparser.add_argument("--n_agents", type=int, default=3)
     argparser.add_argument("--n_rounds", type=int, default=3)
-    argparser.add_argument("--n_reps", type=int, default=3)
+    argparser.add_argument("--n_reps", type=int, default=1)
     argparser.add_argument("--output_dir", type=str, default='results/')
     argparser.add_argument("--n_adversaries", type=int, default=1)
     argparser.add_argument("--group_model", type=str, default='gpt-4o')
-    argparser.add_argument("--adv_model", type=str, default='gpt-3.5-turbo')
+    argparser.add_argument("--adv_model", type=str, default='gpt-4o')
     argparser.add_argument("--gpus", type=str, default='0')
 
 
     argparser.add_argument("--run_optim", type=bool, default=False)
     argparser.add_argument("--run_context", type=bool, default=False)
     argparser.add_argument("--n_arguments", type=int, default=10)
-    argparser.add_argument("--judge_model", type=str, default='gpt-3.5-turbo')
+    argparser.add_argument("--judge_model", type=str, default='gpt-4o')
 
     args = argparser.parse_args()
 
