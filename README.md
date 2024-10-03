@@ -2,6 +2,7 @@
 
 Code for the paper "MultiAgent Collaboration Attack: Investigating Adversarial Attacks in Large Language Model Collaborations via Debate"
 
+ ![Attack Description](multiagent_debate/plots/attack_idea_example.png.png "Example of Adversary in Debate")
 
 # Installation
 
@@ -14,7 +15,7 @@ numpy
 openai
 ```
 
-To use OpenAI models, it reads the API key from the environment variable `OPENAI_API_KEY`. You can add it to your environment as follows:
+To use OpenAI models, it reads the API key from the environment variable `OPENAI_API_KEY`. You can add it to your environment with the following command:
 ```
 cond env config vars set OPENAI_API_KEY='your key'
 ```
