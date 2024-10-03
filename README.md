@@ -20,6 +20,18 @@ To use OpenAI models, it reads the API key from the environment variable `OPENAI
 cond env config vars set OPENAI_API_KEY='your key'
 ```
 
+# Datasets
+
+The following datasets have been used in the experiments: 
+- TruthfulQA
+- MMLU
+- MedMCQA
+- Scalr
+
+Datasets can be downloaded from the following link: [data download](https://drive.google.com/drive/folders/1MGLnI3MQWbSqU8TR2mZHssND5CsQdyTn?usp=share_link)  
+The folder is expected to be saved in the directory: `multiagent_debate/data`
+
+
 # Running instruction
 
 ## Debate
